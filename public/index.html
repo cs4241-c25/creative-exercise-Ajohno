@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js Multi-App Server</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #222;
+        color: white;
+      }
+      canvas {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      #controls {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+      }
+      button {
+        margin: 5px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <button onclick="loadScript('virtualagent.js')">Virtual Agent</button>
+      <button onclick="loadScript('game.js')">Game</button>
+      <button onclick="loadScript('audiovisualizer.js')">
+        Audio Visualizer
+      </button>
+    </div>
+
+    <script>
+      let currentScript = null;
+      let currentAudioContext = null;
+
+      function loadScript(scriptName) {
+        // Stop audio if switching from Audio Visualizer
+        if (currentAudioContext) {
+          currentAudioContext.close();
+          currentAudioContext = null;
+        }
+        if (window.currentAudio) {
+          window.currentAudio.pause();
+          window.currentAudio.src = "";
+          window.currentAudio = null;
+        }
+
+        // Remove the previous script
+        if (currentScript) {
+          currentScript.remove();
+          currentScript = null;
+        }
+
+        // Clear previous canvas if any
+        const oldCanvas = document.querySelector("canvas");
+        if (oldCanvas) {
+          oldCanvas.remove();
+        }
+
+        // Load the new script (force reload)
+        const script = document.createElement("script");
+        script.type = "module";
+        script.src = scriptName + "?t=" + new Date().getTime(); // Prevent caching
+        script.id = "dynamicScript";
+
+        document.body.appendChild(script);
+        currentScript = script;
+      }
+    </script>
+  </body>
+</html>
